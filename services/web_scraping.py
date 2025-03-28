@@ -11,7 +11,7 @@ def baixar_arquivos(url, name):
         name (str): Nome do arquivo a ser salvo no diretório.
 
     Retorno:
-        str: Caminho do arquivo salvo no sistema, se o download for bem-sucedido, ou None caso contrário.
+        str: Caminho do arquivo salvo no sistema.
     """
     response = requests.get(url)
     file_path = f'./data/teste1/{name}'
