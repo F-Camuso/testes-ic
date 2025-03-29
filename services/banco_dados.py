@@ -44,10 +44,8 @@ def processamento_operadoras():
     dados_demo_contabeis = []
     for row in df_demo_contabeis.itertuples(index=False, name=None):
         dados_demo_contabeis.append(tuple(row))
-    insere_lotes(connection, cursor, query_demo_contabeis, dados_demo_contabeis) # inserção em lotes pra evitar timeout no execute
-    linhas_inseridas_demo = cursor.rowcount()
+    linhas_inseridas_demo = insere_lotes(connection, cursor, query_demo_contabeis, dados_demo_contabeis) # inserção em lotes pra evitar timeout no execute
     cursor.close()
-    connection.close()
 
     # Tabela das operadoras
     cursor = connection.cursor()
@@ -75,6 +73,7 @@ def processamento_operadoras():
     connection.commit()
     linhas_inseridas_operadoras = cursor.rowcount
     cursor.close()
+    connection.close()
 
     return linhas_inseridas_demo, linhas_inseridas_operadoras
     
@@ -90,12 +89,15 @@ def insere_lotes(connection, cursor, query, data, tamanho_lote=1000):
             tamanho_lote (int): Tamanho do lote de dados a ser inserido de cada vez. O padrão é 1000.
 
         Retorno:
-            None: A função realiza a inserção dos dados diretamente no banco de dados.
+            int: A cada inserção, adiciona a quantidade de linhas inseridas na variável linhas_inseridas.
     """
+    linhas_inseridas = 0
     for i in range(0, len(data), tamanho_lote):
         batch = data[i:i+tamanho_lote]
         cursor.executemany(query, batch)
+        linhas_inseridas = linhas_inseridas + cursor.rowcount
         connection.commit()
+    return linhas_inseridas
 
 def adiciona_csv_df(diretorio):
     """

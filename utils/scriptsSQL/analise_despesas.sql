@@ -4,9 +4,11 @@ SELECT
 FROM
     demonstracoes_contabeis
 WHERE
-    data BETWEEN (SELECT MAX(data) - INTERVAL 3 MONTH FROM demonstracoes_contabeis) 
+    data BETWEEN (SELECT MAX(data) - INTERVAL %s MONTH FROM demonstracoes_contabeis) 
 		AND 
         (SELECT MAX(data) FROM demonstracoes_contabeis)
+	AND 
+    descricao like 'EVENTOS/ SINISTROS CONHECIDOS OU AVISADOS  DE ASSISTÊNCIA A SAÚDE MEDICO HOSPITALAR '
 GROUP BY reg_ans
 ORDER BY despesas DESC
 LIMIT 10
