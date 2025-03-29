@@ -39,7 +39,7 @@ def realizar_scraping(url):
     arquivos_baixados = []
     for link in links: # Para cada link, verificar se existe a palavra Anexo e se é um pdf
         href = link['href']
-        text = link.get_text().replace('.', '')
+        text = link.get_text().replace('.', '') # Limpeza do nome
         if 'Anexo' in text and href.endswith('.pdf'): 
             print(f'Encontrei: {text}: {href}')
             baixar_arquivos(href, f'{text}.pdf')
