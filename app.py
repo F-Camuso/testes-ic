@@ -1,11 +1,14 @@
 from flask import Flask
+from flask_cors import CORS
 from routes.web_scraping import web_scraping_bp
 from routes.tratamento_dados import tratamento_dados_bp
 from routes.banco_dados import execucao_processamento_bp
 from routes.busca_despesas import busca_despesas_bp
 from routes.busca_operadora import busca_operadora_bp
 
+
 app = Flask(__name__)
+CORS(app)
 
 # Equivalente ao teste 1 
 app.register_blueprint(web_scraping_bp)

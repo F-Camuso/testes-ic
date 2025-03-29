@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <link rel="stylesheet" href="front/styles.css" />
+  </head>
+  <body>
+    <div id="app" class="container">
+      <!-- Buscar Operadora -->
+      <h2>Buscar Operadora</h2>
+      <input v-model="nome" placeholder="Digite o nome" class="input" />
+      <button @click="buscarOperadora" class="btn">Buscar</button>
+
+      <table v-if="resultadoOperadora.length" class="styled-table">
+        <thead>
+          <tr>
+            <th>CNPJ</th>
+            <th>Operadora</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item, index) in resultadoOperadora" :key="index">
+            <td>{{ item.cnpj }}</td>
+            <td>{{ item.Operadora }}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Buscar Despesas -->
+      <h2>Buscar Despesas</h2>
+      <input
+        v-model="meses"
+        placeholder="Digite o número de meses"
+        class="input"
+      />
+      <button @click="buscarDespesas" class="btn">Buscar</button>
+
+      <table v-if="resultadoDespesas.length" class="styled-table">
+        <thead>
+          <tr>
+            <th>Operadora</th>
+            <th>Despesa (R$)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="(item, index) in resultadoDespesas" :key="index">
+            <td>{{ item.nomeOperadora }}</td>
+            <td>{{ item.despesas }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <script src="front/app.js"></script>
+  </body>
+</html>
