@@ -5,6 +5,7 @@ import os
 import pandas as pd
 from utils.conexao import setup_database
 from utils.arquivos import download_arquivos, descompacta_arquivos
+from utils.logger import setup_logger
 
 def processamento_operadoras():
     """
@@ -15,11 +16,13 @@ def processamento_operadoras():
         linhas_inseridas_demo (int): Quantidade de linhas adicionadas na tabela das despesas 
         linhas_inseridas_operadoras (int): Quantidade de linhas adicionadas na tabela das operadoras
     """
+    logger = setup_logger("processar_dados")
+
     connection = setup_database()
     if connection is None:
-        print("Falha na conexão com o banco de dados.")
+        logger.error("Falha na conexão com o banco de dados.")
         return
-    
+
     # Tabela das contas
     cursor = connection.cursor()
     url_base = 'https://dadosabertos.ans.gov.br/FTP/PDA/demonstracoes_contabeis/'
@@ -34,10 +37,14 @@ def processamento_operadoras():
         for zip in arquivos_zip:
             url_zip = url_ano + zip
             caminho_arquivo_baixado = download_arquivos(url_zip, caminho_zip)
+            logger.info(f"Arquivo: {caminho_arquivo_baixado} extraido.")
             descompacta_arquivos(caminho_arquivo_baixado, caminho_csv)
+
+    logger.info("Arquivos csvs descompactados")
     
     df_demo_contabeis = adiciona_csv_df(caminho_csv)
-
+    logger.info("Dados das despesas adicionados em um dataframe")
+    
     with open('./utils/scriptsSQL/insercao_demonstracoes_contabeis.sql', 'r') as file:
         query_demo_contabeis = file.read()
     
@@ -45,6 +52,7 @@ def processamento_operadoras():
     for row in df_demo_contabeis.itertuples(index=False, name=None):
         dados_demo_contabeis.append(tuple(row))
     linhas_inseridas_demo = insere_lotes(connection, cursor, query_demo_contabeis, dados_demo_contabeis) # inserção em lotes pra evitar timeout no execute
+    logger.info(f"Dados dos csvs inseridos na tabela demonstracoes_contabeis, quantidade de linhas afetadas: {linhas_inseridas_demo}")
     cursor.close()
 
     # Tabela das operadoras
@@ -57,12 +65,13 @@ def processamento_operadoras():
         if '.csv' in href:
             url_csv = url_segunda_tabela + href
             csv_baixado = download_arquivos(url_csv, './data/operadoras_ativas')
+    logger.info(f"Arquivo: {csv_baixado} baixado.")
     
     df = pd.read_csv(csv_baixado, delimiter=';', encoding='utf-8', dtype=object)
     df['Numero'] = df['Numero'].str.replace(r'\.0$', '', regex=True)
     df['Numero'] = df['Numero'].str.replace('.', '', regex=False)
     df = df.fillna('')
-    
+    logger.info("Dados das operadoras adicionados em um dataframe")
     with open('./utils/scriptsSQL/insercao_relatorio_cadop.sql', 'r') as file:
         query = file.read()
 
@@ -72,11 +81,12 @@ def processamento_operadoras():
     cursor.executemany(query, dados)
     connection.commit()
     linhas_inseridas_operadoras = cursor.rowcount
+    logger.info(f"Dados dos csvs inseridos na tabela relatorio_cadop, quantidade de linhas afetadas: {linhas_inseridas_operadoras}")
     cursor.close()
     connection.close()
 
     return linhas_inseridas_demo, linhas_inseridas_operadoras
-    
+
 def insere_lotes(connection, cursor, query, data, tamanho_lote=5000):
     """
         Função que insere dados em lotes no banco de dados, utilizando um tamanho de lote configurável.

@@ -1,5 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
+from utils.logger import setup_logger
 import os
 
 def baixar_arquivos(url, name): 
@@ -13,12 +14,16 @@ def baixar_arquivos(url, name):
     Retorno:
         str: Caminho do arquivo salvo no sistema.
     """
+    logger = setup_logger("web_scraping")
+
     response = requests.get(url)
     file_path = f'./data/teste1/{name}'
     os.makedirs(os.path.dirname(file_path), exist_ok=True)
     with open(file_path, 'wb') as file:
         file.write(response.content)
-    print(f"Download do arquivo '{name}' feito com sucesso.")
+    logger.info(f"Download do arquivo '{name}' feito com sucesso.")
+
+    return file_path
 
 
 def realizar_scraping(url):
@@ -31,7 +36,7 @@ def realizar_scraping(url):
     Retorno:
         list: Uma lista com o caminho dos arquivos baixados.
     """
-   
+    logger = setup_logger("web_scraping")
     pagina = requests.get(url)
     soup = BeautifulSoup(pagina.text, 'html.parser')
     links = soup.find_all('a', href=True) # Busca todos os links do site
@@ -41,9 +46,8 @@ def realizar_scraping(url):
         href = link['href']
         text = link.get_text().replace('.', '') # Limpeza do nome
         if 'Anexo' in text and href.endswith('.pdf'): 
-            print(f'Encontrei: {text}: {href}')
+            logger.info(f"Arquivo {text} encontrado na página")
             baixar_arquivos(href, f'{text}.pdf')
             arquivos_baixados.append(f'./data/teste1/{text}.pdf')
-
     
     return arquivos_baixados

@@ -1,5 +1,6 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, jsonify
 from services.banco_dados import processamento_operadoras
+from utils.logger import setup_logger
 
 execucao_processamento_bp = Blueprint('execucao_processamento', __name__)
 
@@ -14,12 +15,18 @@ def execucao_processamento():
 
     Retornos:
         - 200 OK: Se o processamento for bem-sucedido e os arquivos forem compactados.
+        - 500 Erro Interno: Se ocorrer algum erro no processamento.
         
     """
-    linhas_inseridas_demo, linhas_inseridas_operadoras = processamento_operadoras()
+    logger = setup_logger("execucao_processamento")
+    try:
+        linhas_inseridas_demo, linhas_inseridas_operadoras = processamento_operadoras()
 
-    # Retorna as quantidades de linhas inseridas no formato JSON
-    return jsonify({
-        'linhas_inseridas_demo': linhas_inseridas_demo,
-        'linhas_inseridas_operadoras': linhas_inseridas_operadoras
-    }), 200
+        return jsonify({
+            'linhas_inseridas_demo': linhas_inseridas_demo,
+            'linhas_inseridas_operadoras': linhas_inseridas_operadoras
+        }), 200
+
+    except Exception as e:
+        logger.error(f"Erro no processamento: {e}")
+        return jsonify({'error': 'Erro interno no servidor'}), 500

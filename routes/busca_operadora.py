@@ -1,5 +1,6 @@
 from flask import Blueprint, request, jsonify
 from services.busca_operadora import buscar_nome
+from utils.logger import setup_logger
 
 busca_operadora_bp = Blueprint('buscar_operadora', __name__)
 
@@ -12,12 +13,20 @@ def buscar_operadora():
             - nome (query string): Nome da operadora a ser buscada.
 
         Retorno:
-            - JSON com os resultados encontrados ou erro se o parâmetro 'nome' não for fornecido.
+            - 200 OK: JSON com os resultados encontrados.
+            - 400 Bad Request: Se o parâmetro 'nome' não for fornecido.
+            - 500 Erro Interno: Se ocorrer um erro no processamento.
     """
-    nome = request.args.get('nome')
-    
-    if not nome:
-        return jsonify({"erro": "O parâmetro 'nome' é obrigatório."}), 400
+    logger = setup_logger("buscar_operadora")
 
-    resultados = buscar_nome(nome)
-    return jsonify(resultados), 200
+    try:
+        nome = request.args.get('nome')
+        if not nome:
+            return jsonify({"erro": "O parâmetro 'nome' é obrigatório."}), 400
+
+        resultados = buscar_nome(nome)
+        return jsonify(resultados), 200
+
+    except Exception as e:
+        logger.error(f"Erro ao buscar operadora: {e}")
+        return jsonify({"erro": "Erro interno no servidor"}), 500

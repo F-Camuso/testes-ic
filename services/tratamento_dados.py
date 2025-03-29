@@ -2,6 +2,7 @@ import pdfplumber
 import csv
 import re
 import os
+from utils.logger import setup_logger 
 
 def processar_pdf():
     """
@@ -10,13 +11,15 @@ def processar_pdf():
     Retorno:
         - str: Caminho do csv para ser compactado.
     """
+    logger = setup_logger("tratamento_dados")
     pdf_path = './data/teste1/Anexo I.pdf'
     csv_path = './data/teste2/tabela_rol_procedimentos_saude.csv'
     
     os.makedirs(os.path.dirname(csv_path), exist_ok=True)
     
     dicionario = coleta_legenda(pdf_path) # Criação do dicionario utilizado para troca de siglas
-
+    logger.info("Dicionario de siglas criado")
+    logger.info("Iniciando extração das tabelas nas páginas do PDF")
     with pdfplumber.open(pdf_path) as pdf: # Coleta do PDF com o pdfplumber
         with open(csv_path, mode='w', newline='', encoding='utf-8') as file:  
             writer = csv.writer(file)
@@ -27,10 +30,11 @@ def processar_pdf():
                     if not cabecalho_preenchido: # Prenchimento do header
                         writer.writerow(table[0])
                         cabecalho_preenchido = True
+                        logger.info("Cabeçalho da tabela preenchido")
                     for row in table[1:]:  # Coleta das linhas da tabela a partir da segunda celula, ignorando o header
                         row_substituida = troca_siglas(dicionario, row, table[0])
                         writer.writerow(row_substituida) # Escrita da row depois de fazer a troca da sigla onde existir OD ou AMB
-
+    logger.info(f"CSV criado com sucesso, caminho: {csv_path}")
     return [csv_path]
 
 def troca_siglas(dicionario, linha, cabecalho):

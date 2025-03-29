@@ -1,5 +1,6 @@
 import mysql.connector
 import os
+from utils.logger import setup_logger
 
 def get_connection(database=None):
     """
@@ -8,6 +9,7 @@ def get_connection(database=None):
     Retorno:
         connection (mysql.connector.connection.MySQLConnection): Conexão ativa com o banco de dados.
     """
+    logger = setup_logger("banco_dados")
     connection = mysql.connector.connect(
         host=os.getenv('DB_HOST'),
         user=os.getenv('DB_USER'),
@@ -16,7 +18,7 @@ def get_connection(database=None):
     )
     
     if connection.is_connected():
-        print("MySQL conectado")
+        logger.info("Conexão com o banco de dados realizada com sucesso.")
     
     return connection
 
