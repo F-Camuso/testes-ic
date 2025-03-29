@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from services.tratamento_dados import processar_pdf
-from utils.compactar_arquivos import compactar_arquivos
+from utils.arquivos import compactar_arquivos
 
 tratamento_dados_bp = Blueprint('tratamento_dados', __name__)
 

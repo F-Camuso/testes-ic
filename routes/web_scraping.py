@@ -1,6 +1,6 @@
 from flask import Blueprint, request, jsonify
 from services.web_scraping import realizar_scraping
-from utils.compactar_arquivos import compactar_arquivos
+from utils.arquivos import compactar_arquivos
 
 
 web_scraping_bp = Blueprint('web_scraping', __name__)

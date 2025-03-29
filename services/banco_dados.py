@@ -2,9 +2,9 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import os
-import zipfile
 import pandas as pd
 from utils.conexao import setup_database
+from utils.arquivos import download_arquivos, descompacta_arquivos
 
 def processamento_operadoras():
     """
@@ -77,7 +77,7 @@ def processamento_operadoras():
 
     return linhas_inseridas_demo, linhas_inseridas_operadoras
     
-def insere_lotes(connection, cursor, query, data, tamanho_lote=1000):
+def insere_lotes(connection, cursor, query, data, tamanho_lote=5000):
     """
         Função que insere dados em lotes no banco de dados, utilizando um tamanho de lote configurável.
 
@@ -86,7 +86,10 @@ def insere_lotes(connection, cursor, query, data, tamanho_lote=1000):
             cursor (objeto): Cursor associado à conexão para executar as operações no banco.
             query (str): Comando SQL para inserir os dados.
             data (list): Lista contendo os dados a serem inseridos no banco.
-            tamanho_lote (int): Tamanho do lote de dados a ser inserido de cada vez. O padrão é 1000.
+            tamanho_lote (int): Tamanho do lote de dados a ser inserido de cada vez. Tempo de execução:
+                - 1000 (~5min)
+                - 5000 (~2min) Padrão
+                - 10000 (~2min)
 
         Retorno:
             int: A cada inserção, adiciona a quantidade de linhas inseridas na variável linhas_inseridas.
@@ -96,7 +99,8 @@ def insere_lotes(connection, cursor, query, data, tamanho_lote=1000):
         batch = data[i:i+tamanho_lote]
         cursor.executemany(query, batch)
         linhas_inseridas = linhas_inseridas + cursor.rowcount
-        connection.commit()
+
+    connection.commit()
     return linhas_inseridas
 
 def adiciona_csv_df(diretorio):
@@ -150,38 +154,3 @@ def lista_diretorios(url, tipo):
                 diretorios.append(href)
 
     return diretorios
-
-def download_arquivos(url, caminho_pasta):
-    """
-    Função que realiza o download de um arquivo a partir de uma URL e o salva em um diretório local.
-
-    Parâmetros:
-        url (str): URL do arquivo a ser baixado.
-        caminho_pasta (str): Caminho do diretório onde o arquivo será salvo.
-
-    Retorno:
-        str: Caminho completo do arquivo baixado.
-    """
-
-    caminho_arquivo = os.path.join(caminho_pasta, os.path.basename(url))
-    response = requests.get(url)
-
-    os.makedirs(caminho_pasta, exist_ok=True)
-    with open(caminho_arquivo, 'wb') as file:
-        file.write(response.content)
-    return caminho_arquivo
-
-def descompacta_arquivos(caminho_arquivos, caminho_extracao):
-    """
-    Função que descompacta um arquivo ZIP em um diretório específico.
-
-    Parâmetros:
-        caminho_arquivos (str): Caminho do arquivo ZIP a ser extraído.
-        caminho_extracao (str): Diretório onde os arquivos serão extraídos.
-
-    Retorno:
-        None
-    """
-    os.makedirs(caminho_extracao, exist_ok=True)
-    with zipfile.ZipFile(caminho_arquivos, 'r') as zip_ref:
-        zip_ref.extractall(caminho_extracao)
