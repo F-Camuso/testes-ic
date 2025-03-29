@@ -47,7 +47,7 @@ def realizar_scraping(url):
         text = link.get_text().replace('.', '') # Limpeza do nome
         if 'Anexo' in text and href.endswith('.pdf'): 
             logger.info(f"Arquivo {text} encontrado na página")
-            baixar_arquivos(href, f'{text}.pdf')
-            arquivos_baixados.append(f'./data/teste1/{text}.pdf')
+            caminho = baixar_arquivos(href, f'{text}.pdf')
+            arquivos_baixados.append(caminho)
     
     return arquivos_baixados
