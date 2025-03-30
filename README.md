@@ -8,11 +8,25 @@
 </p>
 
 ---
-
-# Descrição
+## Descrição
   * O projeto tem como objetivo realizar extração, tratamento e análise de dados financeiros a partir de diferentes fontes, utilizando web scraping, manipulação de arquivos CSV e PDF, e consulta a bancos de dados. Além disso, possui um front-end desenvolvido em Vue.js que permite realizar a busca das despesas e das operadoras.
 ---
-# Pré-requisitos
+## Estrutura do projeto
+  * Cada arquivo dentro de /services corresponde a um teste
+  
+    |Arquivo| teste |
+    |-------|-------|
+    |web_scraping.py| TESTE 1|
+    |tratamento_dados.py| TESTE 1|
+    |banco_dados.py| TESTE 3|
+    |busca_despesas.py| TESTE 3|
+    |busca_operadora.py| TESTE 4|
+    ---    
+  * Os scripts SQL estão dentro da pasta /utils/scriptsSQL
+  * O front-end da parte 4 se encontra dentro da pasta /front
+  * Os arquivos gerados por cada teste ficam salvos dentro da pasta /data (Como os arquivos são pesados, não subi no git)
+
+## Pré-requisitos
 ``` 
 # Instalar dependências
 pip install -r requirements.txt
@@ -32,7 +46,7 @@ python app.py
 # Abrir o front-end
 Basta abrir o arquivo index.html
 ```
-# Endpoints
+## Endpoints
 A collection no postman já está com as rotas e os valores preenchidos, basta chamar.
 | Método | Rota                | Equivalencia no teste   | Parametros |
 |--------|---------------------|-------------------------|------|
@@ -41,12 +55,8 @@ A collection no postman já está com as rotas e os valores preenchidos, basta c
 | GET    | `/execucao_processamento`    | TESTE 3  | Sem parametro |
 | GET | `/buscar_despesas`    | TESTE 3       |meses (query string)   |
 | GET    | `/buscar_operadora`    | TESTE 4     |nome (query string) |
-
-```
-
-```
 ---
-# Bibliotecas Utilizadas
+## Bibliotecas Utilizadas
  * Flask - Back-end da aplicação
  * requests - Requisições HTTP
  * BeautifulSoup - Web scraping
