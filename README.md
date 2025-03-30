@@ -23,11 +23,26 @@ cp .env-example .env
 # Configurar um banco de dados (usei o docker para isso)
 docker pull mysql:latest
 
+# Rodar o banco (eu fiz com o root, se for configurar um usuario novo, basta adicionar os parametros)
+docker run --name {nome_container} -e MYSQL_ROOT_PASSWORD={senha} -p 3306:3306 -d mysql:latest
+
 # Rodar a aplicação
 python app.py
 
-# Rodar o banco (eu fiz com o root, se for configurar um usuario novo, basta adicionar os parametros)
-docker run --name {nome_container} -e MYSQL_ROOT_PASSWORD={senha} -p 3306:3306 -d mysql:latest
+# Abrir o front-end
+Basta abrir o arquivo index.html
+```
+# Endpoints
+A collection no postman já está com as rotas e os valores preenchidos, basta chamar.
+| Método | Rota                | Equivalencia no teste   | Parametros |
+|--------|---------------------|-------------------------|------|
+| POST    | `/web_scraping`         | TESTE 1 | Body (JSON): {"url": "URL do site"} | 
+| GET   | `/tratamento_dados`         | TESTE 2    | name (query string) |
+| GET    | `/execucao_processamento`    | TESTE 3  | Sem parametro |
+| GET | `/buscar_despesas`    | TESTE 3       |meses (query string)   |
+| GET    | `/buscar_operadora`    | TESTE 4     |nome (query string) |
+
+```
 
 ```
 ---
